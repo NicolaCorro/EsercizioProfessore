@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['azione'])) {
             $error = 'Formato scadenza non valido (usa MM/YYYY)';
         } else {
             // Verifica se è la prima carta (diventa predefinita)
-            $stmt = $conn->prepare("SELECT COUNT(*) as num_carte FROM carta_credito WHERE id_utente = ?");
+            $stmt = $conn->prepare("SELECT COUNT(*) as num_carte FROM carte_credito WHERE id_utente = ?");
             $stmt->bind_param("i", $_SESSION['user_id']);
             $stmt->execute();
             $result = $stmt->get_result()->fetch_assoc();
@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['azione'])) {
             
             // Inserisci carta
             $stmt = $conn->prepare("
-                INSERT INTO carta_credito (id_utente, numero_carta, intestatario, scadenza, tipo_carta, predefinita)
+                INSERT INTO carte_credito (id_utente, numero_carta, intestatario, scadenza, tipo_carta, predefinita)
                 VALUES (?, ?, ?, ?, ?, ?)
             ");
             $stmt->bind_param("issssi", $_SESSION['user_id'], $numero_carta, $intestatario, $scadenza, $tipo_carta, $predefinita);
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['azione'])) {
         $id_carta = intval($_POST['id_carta'] ?? 0);
         
         // Verifica che la carta appartenga all'utente
-        $stmt = $conn->prepare("DELETE FROM carta_credito WHERE id_carta = ? AND id_utente = ?");
+        $stmt = $conn->prepare("DELETE FROM carte_credito WHERE id_carta = ? AND id_utente = ?");
         $stmt->bind_param("ii", $id_carta, $_SESSION['user_id']);
         
         if ($stmt->execute() && $stmt->affected_rows > 0) {
@@ -62,12 +62,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['azione'])) {
         $id_carta = intval($_POST['id_carta'] ?? 0);
         
         // Rimuovi predefinita da tutte le carte
-        $stmt = $conn->prepare("UPDATE carta_credito SET predefinita = 0 WHERE id_utente = ?");
+        $stmt = $conn->prepare("UPDATE carte_credito SET predefinita = 0 WHERE id_utente = ?");
         $stmt->bind_param("i", $_SESSION['user_id']);
         $stmt->execute();
         
         // Imposta nuova predefinita
-        $stmt = $conn->prepare("UPDATE carta_credito SET predefinita = 1 WHERE id_carta = ? AND id_utente = ?");
+        $stmt = $conn->prepare("UPDATE carte_credito SET predefinita = 1 WHERE id_carta = ? AND id_utente = ?");
         $stmt->bind_param("ii", $id_carta, $_SESSION['user_id']);
         
         if ($stmt->execute() && $stmt->affected_rows > 0) {
@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['azione'])) {
 
 // Recupera tutte le carte
 $stmt = $conn->prepare("
-    SELECT * FROM carta_credito
+    SELECT * FROM carte_credito
     WHERE id_utente = ?
     ORDER BY predefinita DESC, data_inserimento DESC
 ");

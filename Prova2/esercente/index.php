@@ -9,7 +9,7 @@ $conn = getDBConnection();
 // Recupera informazioni conto
 $stmt = $conn->prepare("
     SELECT id_conto, saldo, data_creazione
-    FROM conto
+    FROM conti
     WHERE id_utente = ?
 ");
 $stmt->bind_param("i", $_SESSION['user_id']);
@@ -20,8 +20,8 @@ $conto = $result->fetch_assoc();
 // Recupera ultime transazioni ricevute (completate)
 $stmt = $conn->prepare("
     SELECT t.*, u.nome as cliente_nome, u.cognome as cliente_cognome
-    FROM transazione t
-    LEFT JOIN utente u ON t.id_cliente = u.id_utente
+    FROM transazioni t
+    LEFT JOIN utenti u ON t.id_cliente = u.id_utente
     WHERE t.id_esercente = ? AND t.stato = 'COMPLETATA'
     ORDER BY t.data_completamento DESC
     LIMIT 10
@@ -33,8 +33,8 @@ $transazioni_ricevute = $stmt->get_result();
 // Recupera ultime transazioni IN_ATTESA (pagamenti richiesti ma non ancora autorizzati)
 $stmt = $conn->prepare("
     SELECT t.*, u.nome as cliente_nome, u.cognome as cliente_cognome
-    FROM transazione t
-    LEFT JOIN utente u ON t.id_cliente = u.id_utente
+    FROM transazioni t
+    LEFT JOIN utenti u ON t.id_cliente = u.id_utente
     WHERE t.id_esercente = ? AND t.stato = 'IN_ATTESA'
     ORDER BY t.data_richiesta DESC
     LIMIT 5
@@ -46,8 +46,8 @@ $transazioni_attesa = $stmt->get_result();
 // Recupera ultimi movimenti
 $stmt = $conn->prepare("
     SELECT m.*, t.descrizione as trans_descrizione
-    FROM movimento m
-    LEFT JOIN transazione t ON m.id_transazione = t.id_transazione
+    FROM movimenti m
+    LEFT JOIN transazioni t ON m.id_transazione = t.id_transazione
     WHERE m.id_conto = ?
     ORDER BY m.data_movimento DESC
     LIMIT 5

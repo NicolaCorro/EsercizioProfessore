@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $conn = getDBConnection();
             
             // Verifica se email già esistente
-            $stmt = $conn->prepare("SELECT id_utente FROM utente WHERE email = ?");
+            $stmt = $conn->prepare("SELECT id_utente FROM utenti WHERE email = ?");
             $stmt->bind_param("s", $email);
             $stmt->execute();
             $result = $stmt->get_result();
@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 
                 try {
                     // 1. Ottieni ID profilo
-                    $stmt = $conn->prepare("SELECT id_profilo FROM profilo WHERE nome = ?");
+                    $stmt = $conn->prepare("SELECT id_profilo FROM profili WHERE nome = ?");
                     $stmt->bind_param("s", $tipo_profilo);
                     $stmt->execute();
                     $result = $stmt->get_result();
@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     // 2. Inserisci nuovo utente
                     $password_hash = md5($password);
                     $stmt = $conn->prepare("
-                        INSERT INTO utente (email, password, nome, cognome, telefono, id_profilo, attivo)
+                        INSERT INTO utenti (email, password, nome, cognome, telefono, id_profilo, attivo)
                         VALUES (?, ?, ?, ?, ?, ?, 1)
                     ");
                     $stmt->bind_param("sssssi", $email, $password_hash, $nome, $cognome, $telefono, $id_profilo);
@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     // 3. Crea conto con saldo iniziale di 100€
                     $saldo_iniziale = 100.00;
                     $stmt = $conn->prepare("
-                        INSERT INTO conto (id_utente, saldo)
+                        INSERT INTO conti (id_utente, saldo)
                         VALUES (?, ?)
                     ");
                     $stmt->bind_param("id", $id_utente, $saldo_iniziale);
@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     // 4. Registra movimento iniziale
                     $causale = "Bonus registrazione Pay Steam";
                     $stmt = $conn->prepare("
-                        INSERT INTO movimento (id_conto, tipo, importo, causale, saldo_precedente, saldo_nuovo)
+                        INSERT INTO movimenti (id_conto, tipo, importo, causale, saldo_precedente, saldo_nuovo)
                         VALUES (?, 'ENTRATA', ?, ?, 0.00, ?)
                     ");
                     $stmt->bind_param("idsd", $id_conto, $saldo_iniziale, $causale, $saldo_iniziale);

@@ -9,7 +9,7 @@ $conn = getDBConnection();
 // Recupera informazioni conto
 $stmt = $conn->prepare("
     SELECT id_conto, saldo
-    FROM conto
+    FROM conti
     WHERE id_utente = ?
 ");
 $stmt->bind_param("i", $_SESSION['user_id']);
@@ -20,8 +20,8 @@ $conto = $result->fetch_assoc();
 // Recupera tutti i movimenti
 $stmt = $conn->prepare("
     SELECT m.*, t.descrizione as trans_descrizione, t.codice_transazione
-    FROM movimento m
-    LEFT JOIN transazione t ON m.id_transazione = t.id_transazione
+    FROM movimenti m
+    LEFT JOIN transazioni t ON m.id_transazione = t.id_transazione
     WHERE m.id_conto = ?
     ORDER BY m.data_movimento DESC
 ");
@@ -35,7 +35,7 @@ $stmt = $conn->prepare("
         SUM(CASE WHEN tipo = 'ENTRATA' THEN importo ELSE 0 END) as totale_entrate,
         SUM(CASE WHEN tipo = 'USCITA' THEN importo ELSE 0 END) as totale_uscite,
         COUNT(*) as numero_movimenti
-    FROM movimento
+    FROM movimenti
     WHERE id_conto = ?
 ");
 $stmt->bind_param("i", $conto['id_conto']);

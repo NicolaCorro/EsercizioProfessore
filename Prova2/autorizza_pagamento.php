@@ -41,7 +41,7 @@ if (empty($codice_transazione)) {
 }
 
 // Recupera saldo utente corrente
-$stmt = $conn->prepare("SELECT saldo FROM conto WHERE id_utente = ?");
+$stmt = $conn->prepare("SELECT saldo FROM conti WHERE id_utente = ?");
 $stmt->bind_param("i", $_SESSION['user_id']);
 $stmt->execute();
 $result = $stmt->get_result();

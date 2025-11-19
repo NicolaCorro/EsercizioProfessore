@@ -9,7 +9,7 @@ $conn = getDBConnection();
 // Recupera informazioni conto
 $stmt = $conn->prepare("
     SELECT id_conto, saldo, data_creazione
-    FROM conto
+    FROM conti
     WHERE id_utente = ?
 ");
 $stmt->bind_param("i", $_SESSION['user_id']);
@@ -45,8 +45,8 @@ $total_pages = ceil($total_movimenti / $per_page);
 // Query per recuperare i movimenti
 $stmt = $conn->prepare("
     SELECT m.*, t.descrizione as trans_descrizione, t.codice_transazione
-    FROM movimento m
-    LEFT JOIN transazione t ON m.id_transazione = t.id_transazione
+    FROM movimenti m
+    LEFT JOIN transazioni t ON m.id_transazione = t.id_transazione
     $where_clause
     ORDER BY m.data_movimento DESC
     LIMIT ? OFFSET ?
@@ -64,7 +64,7 @@ $stmt = $conn->prepare("
         tipo,
         COUNT(*) as numero,
         SUM(importo) as totale
-    FROM movimento
+    FROM movimenti
     WHERE id_conto = ?
     GROUP BY tipo
 ");

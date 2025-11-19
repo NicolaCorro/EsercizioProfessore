@@ -47,8 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($errors)) {
         $stmt = $conn->prepare("
             SELECT u.id_utente, u.nome, u.cognome, c.id_conto, c.saldo
-            FROM utente u
-            JOIN conto c ON u.id_utente = c.id_utente
+            FROM utenti u
+            JOIN conti c ON u.id_utente = c.id_utente
             WHERE u.email = ? AND u.attivo = 1
         ");
         $stmt->bind_param("s", $email_destinatario);
@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // 1. Crea la transazione
             $codice_transazione = generateTransactionCode();
             $stmt = $conn->prepare("
-                INSERT INTO transazione 
+                INSERT INTO transazioni 
                 (codice_transazione, id_esercente, id_cliente, importo, descrizione, 
                  url_chiamante, url_risposta, stato, data_richiesta, data_autorizzazione, data_completamento)
                 VALUES (?, ?, ?, ?, ?, ?, ?, 'COMPLETATA', NOW(), NOW(), NOW())
@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $nuovo_saldo_mittente = $conto['saldo'] - $importo;
             $nuovo_saldo_destinatario = $destinatario['saldo'] + $importo;
             
-            $stmt = $conn->prepare("UPDATE conto SET saldo = ? WHERE id_conto = ?");
+            $stmt = $conn->prepare("UPDATE conti SET saldo = ? WHERE id_conto = ?");
             
             // Aggiorna saldo mittente (esercente)
             $stmt->bind_param("di", $nuovo_saldo_mittente, $conto['id_conto']);
@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $causale_entrata = "Pagamento ricevuto da " . $_SESSION['user_name'];
             
             $stmt = $conn->prepare("
-                INSERT INTO movimento 
+                INSERT INTO movimenti 
                 (id_conto, id_transazione, tipo, importo, causale, saldo_precedente, saldo_nuovo)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
             ");

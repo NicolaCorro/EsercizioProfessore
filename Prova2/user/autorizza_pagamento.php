@@ -24,8 +24,8 @@ if (empty($codice_transazione)) {
                u.nome as esercente_nome, 
                u.cognome as esercente_cognome,
                u.email as esercente_email
-        FROM transazione t
-        JOIN utente u ON t.id_esercente = u.id_utente
+        FROM transazioni t
+        JOIN utenti u ON t.id_esercente = u.id_utente
         WHERE t.codice_transazione = ?
     ");
     $stmt->bind_param("s", $codice_transazione);
@@ -46,7 +46,7 @@ if (empty($codice_transazione)) {
 }
 
 // Recupera saldo utente corrente
-$stmt = $conn->prepare("SELECT saldo FROM conto WHERE id_utente = ?");
+$stmt = $conn->prepare("SELECT saldo FROM conti WHERE id_utente = ?");
 $stmt->bind_param("i", $_SESSION['user_id']);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $transazione) {
         } else {
             // Aggiorna transazione con id_cliente e data autorizzazione
             $stmt = $conn->prepare("
-                UPDATE transazione 
+                UPDATE transazioni 
                 SET id_cliente = ?, stato = 'AUTORIZZATA', data_autorizzazione = NOW() 
                 WHERE id_transazione = ? AND stato = 'IN_ATTESA'
             ");
@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $transazione) {
                     
                     // Ripristina stato
                     $stmt = $conn->prepare("
-                        UPDATE transazione 
+                        UPDATE transazioni 
                         SET stato = 'IN_ATTESA', id_cliente = NULL, data_autorizzazione = NULL 
                         WHERE id_transazione = ?
                     ");
@@ -124,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $transazione) {
     } elseif ($azione == 'rifiuta') {
         // Rifiuta la transazione
         $stmt = $conn->prepare("
-            UPDATE transazione 
+            UPDATE transazioni 
             SET stato = 'RIFIUTATA', note = 'Rifiutato dall\'utente' 
             WHERE id_transazione = ? AND stato = 'IN_ATTESA'
         ");
