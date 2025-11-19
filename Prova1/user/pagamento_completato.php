@@ -37,12 +37,12 @@ if (!empty($codice_prenotazione)) {
             b.codice_pagamento,
             po.numero_posto,
             m.sigla as materiale
-        FROM PRENOTAZIONE p
-        JOIN TRENO t ON p.id_treno = t.id_treno
-        JOIN STAZIONE sp ON p.id_stazione_partenza = sp.id_stazione
-        JOIN STAZIONE sa ON p.id_stazione_arrivo = sa.id_stazione
-        LEFT JOIN BIGLIETTO b ON p.id_prenotazione = b.id_prenotazione
-        LEFT JOIN POSTO po ON p.id_posto = po.id_posto
+        FROM PRENOTAZIONI p
+        JOIN TRENI t ON p.id_treno = t.id_treno
+        JOIN STAZIONI sp ON p.id_stazione_partenza = sp.id_stazione
+        JOIN STAZIONI sa ON p.id_stazione_arrivo = sa.id_stazione
+        LEFT JOIN BIGLIETTI b ON p.id_prenotazione = b.id_prenotazione
+        LEFT JOIN POSTI po ON p.id_posto = po.id_posto
         LEFT JOIN MATERIALE_ROTABILE m ON po.id_materiale = m.id_materiale
         WHERE p.codice_prenotazione = ? AND p.id_utente = ?
     ");
