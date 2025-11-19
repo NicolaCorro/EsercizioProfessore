@@ -23,10 +23,10 @@ $stmt = $conn->prepare("
         c.posti_totali,
         sp.nome as stazione_partenza,
         sa.nome as stazione_arrivo
-    FROM treno t
-    JOIN convoglio c ON t.id_convoglio = c.id_convoglio
-    JOIN stazione sp ON t.id_stazione_partenza = sp.id_stazione
-    JOIN stazione sa ON t.id_stazione_arrivo = sa.id_stazione
+    FROM treni t
+    JOIN convogli c ON t.id_convoglio = c.id_convoglio
+    JOIN stazioni sp ON t.id_stazione_partenza = sp.id_stazione
+    JOIN stazioni sa ON t.id_stazione_arrivo = sa.id_stazione
     WHERE t.id_treno = ?
 ");
 $stmt->bind_param("i", $id_treno);
@@ -48,8 +48,8 @@ $stmt = $conn->prepare("
         s.id_stazione,
         s.nome as stazione,
         s.km_progressivo
-    FROM fermata f
-    JOIN stazione s ON f.id_stazione = s.id_stazione
+    FROM fermate f
+    JOIN stazioni s ON f.id_stazione = s.id_stazione
     WHERE f.id_treno = ?
     ORDER BY f.ordine_fermata ASC
 ");
@@ -65,10 +65,10 @@ $stmt = $conn->prepare("
         m.posti_sedere,
         tm.nome as tipo,
         cc.posizione
-    FROM composizione_convoglio cc
+    FROM composizioni cc
     JOIN materiale_rotabile m ON cc.id_materiale = m.id_materiale
-    JOIN tipo_materiale tm ON m.id_tipo = tm.id_tipo
-    JOIN treno t ON cc.id_convoglio = t.id_convoglio
+    JOIN tipi_materiale tm ON m.id_tipo = tm.id_tipo
+    JOIN treni t ON cc.id_convoglio = t.id_convoglio
     WHERE t.id_treno = ?
     ORDER BY cc.posizione ASC
 ");

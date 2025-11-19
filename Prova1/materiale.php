@@ -7,7 +7,7 @@ $conn = getDBConnection();
 $query = "
     SELECT m.*, t.nome as tipo_nome
     FROM MATERIALE_ROTABILE m
-    JOIN TIPO_MATERIALE t ON m.id_tipo = t.id_tipo
+    JOIN TIPI_MATERIALE t ON m.id_tipo = t.id_tipo
     ORDER BY t.id_tipo, m.sigla
 ";
 $materiali = $conn->query($query);

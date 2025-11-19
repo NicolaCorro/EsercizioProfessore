@@ -4,7 +4,7 @@ require_once 'config.php';
 $conn = getDBConnection();
 
 // Recupera tutte le stazioni ordinate per km
-$query = "SELECT * FROM STAZIONE ORDER BY km_progressivo ASC";
+$query = "SELECT * FROM STAZIONI ORDER BY km_progressivo ASC";
 $stazioni = $conn->query($query);
 
 closeDBConnection($conn);

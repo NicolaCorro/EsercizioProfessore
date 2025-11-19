@@ -17,11 +17,11 @@ $query = "
         sa.nome as stazione_arrivo,
         MIN(f.orario_partenza) as orario_partenza_prima,
         MAX(f.orario_arrivo) as orario_arrivo_ultima
-    FROM treno t
-    JOIN convoglio c ON t.id_convoglio = c.id_convoglio
-    JOIN stazione sp ON t.id_stazione_partenza = sp.id_stazione
-    JOIN stazione sa ON t.id_stazione_arrivo = sa.id_stazione
-    LEFT JOIN fermata f ON t.id_treno = f.id_treno
+    FROM treni t
+    JOIN convogli c ON t.id_convoglio = c.id_convoglio
+    JOIN stazioni sp ON t.id_stazione_partenza = sp.id_stazione
+    JOIN stazioni sa ON t.id_stazione_arrivo = sa.id_stazione
+    LEFT JOIN fermate f ON t.id_treno = f.id_treno
     WHERE t.data_partenza >= CURDATE()
     GROUP BY t.id_treno, t.numero_treno, t.data_partenza, t.direzione, t.stato, 
              c.nome, c.posti_totali, sp.nome, sa.nome
