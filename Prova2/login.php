@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt = $conn->prepare("
             SELECT u.id_utente, u.email, u.password, u.nome, u.cognome, p.nome as profilo
             FROM utenti u
-            JOIN profilo p ON u.id_profilo = p.id_profilo
+            JOIN profili p ON u.id_profilo = p.id_profilo
             WHERE u.email = ? AND u.attivo = 1
         ");
         $stmt->bind_param("s", $email);

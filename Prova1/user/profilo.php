@@ -27,7 +27,7 @@ if (isset($_POST['aggiorna_dati'])) {
     if (empty($nome) || empty($cognome)) {
         $error = "Nome e cognome sono obbligatori.";
     } else {
-        $stmt = $conn->prepare("UPDATE UTENTE SET nome = ?, cognome = ?, telefono = ? WHERE id_utente = ?");
+        $stmt = $conn->prepare("UPDATE UTENTI SET nome = ?, cognome = ?, telefono = ? WHERE id_utente = ?");
         $stmt->bind_param("sssi", $nome, $cognome, $telefono, $user_id);
         
         if ($stmt->execute()) {
@@ -48,7 +48,7 @@ if (isset($_POST['cambia_password'])) {
     $conferma_password = $_POST['conferma_password'];
     
     // Recupera password attuale dal database
-    $stmt = $conn->prepare("SELECT password FROM UTENTE WHERE id_utente = ?");
+    $stmt = $conn->prepare("SELECT password FROM UTENTI WHERE id_utente = ?");
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
     $result = $stmt->get_result()->fetch_assoc();
@@ -62,7 +62,7 @@ if (isset($_POST['cambia_password'])) {
         $password_error = "Le password non corrispondono.";
     } else {
         $password_hash = md5($nuova_password);
-        $stmt = $conn->prepare("UPDATE UTENTE SET password = ? WHERE id_utente = ?");
+        $stmt = $conn->prepare("UPDATE UTENTI SET password = ? WHERE id_utente = ?");
         $stmt->bind_param("si", $password_hash, $user_id);
         
         if ($stmt->execute()) {
@@ -76,8 +76,8 @@ if (isset($_POST['cambia_password'])) {
 // Recupera dati utente
 $stmt = $conn->prepare("
     SELECT u.*, p.nome as tipo_profilo 
-    FROM UTENTE u
-    JOIN PROFILO p ON u.id_profilo = p.id_profilo
+    FROM UTENTI u
+    JOIN PROFILI p ON u.id_profilo = p.id_profilo
     WHERE u.id_utente = ?
 ");
 $stmt->bind_param("i", $user_id);
@@ -90,7 +90,7 @@ $stmt = $conn->prepare("
         COUNT(*) as tot_prenotazioni,
         COUNT(CASE WHEN stato = 'CONFERMATA' THEN 1 END) as confermate,
         COUNT(CASE WHEN stato = 'ANNULLATA' THEN 1 END) as annullate
-    FROM PRENOTAZIONE 
+    FROM PRENOTAZIONI 
     WHERE id_utente = ?
 ");
 $stmt->bind_param("i", $user_id);
@@ -102,10 +102,10 @@ $stmt = $conn->prepare("
     SELECT 
         SUM(ABS(sa.km_progressivo - sp.km_progressivo)) as km_totali,
         SUM(b.importo) as spesa_totale
-    FROM PRENOTAZIONE p
-    JOIN STAZIONE sp ON p.id_stazione_partenza = sp.id_stazione
-    JOIN STAZIONE sa ON p.id_stazione_arrivo = sa.id_stazione
-    LEFT JOIN BIGLIETTO b ON p.id_prenotazione = b.id_prenotazione
+    FROM PRENOTAZIONI p
+    JOIN STAZIONI sp ON p.id_stazione_partenza = sp.id_stazione
+    JOIN STAZIONI sa ON p.id_stazione_arrivo = sa.id_stazione
+    LEFT JOIN BIGLIETTI b ON p.id_prenotazione = b.id_prenotazione
     WHERE p.id_utente = ? AND p.stato = 'CONFERMATA'
 ");
 $stmt->bind_param("i", $user_id);

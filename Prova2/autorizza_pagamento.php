@@ -24,8 +24,8 @@ if (empty($codice_transazione)) {
                u.nome as esercente_nome, 
                u.cognome as esercente_cognome,
                u.email as esercente_email
-        FROM transazione t
-        JOIN utente u ON t.id_esercente = u.id_utente
+        FROM transazioni t
+        JOIN utenti u ON t.id_esercente = u.id_utente
         WHERE t.codice_transazione = ?
     ");
     $stmt->bind_param("s", $codice_transazione);
@@ -78,7 +78,7 @@ if ($transazione) {
             } else {
                 // Aggiorna transazione con id_cliente e data autorizzazione
                 $stmt = $conn->prepare("
-                    UPDATE transazione 
+                    UPDATE transazioni 
                     SET id_cliente = ?, stato = 'AUTORIZZATA', data_autorizzazione = NOW() 
                     WHERE id_transazione = ? AND stato = 'IN_ATTESA'
                 ");
@@ -118,7 +118,7 @@ if ($transazione) {
                     } else {
                         $error_auth = 'Errore tecnico nel trasferimento fondi.';
                         // Rollback stato
-                        $conn->query("UPDATE transazione SET stato = 'IN_ATTESA' WHERE id_transazione = " . $transazione['id_transazione']);
+                        $conn->query("UPDATE transazioni SET stato = 'IN_ATTESA' WHERE id_transazione = " . $transazione['id_transazione']);
                     }
                 } else {
                     $error_auth = 'Errore: Transazione già elaborata da un\'altra richiesta.';
@@ -126,7 +126,7 @@ if ($transazione) {
             }
             
         } elseif ($azione == 'rifiuta') {
-            $stmt = $conn->prepare("UPDATE transazione SET stato = 'RIFIUTATA', note = 'Rifiuto Utente' WHERE id_transazione = ?");
+            $stmt = $conn->prepare("UPDATE transazioni SET stato = 'RIFIUTATA', note = 'Rifiuto Utente' WHERE id_transazione = ?");
             $stmt->bind_param("i", $transazione['id_transazione']);
             if ($stmt->execute()) {
                 // Notifica rifiuto

@@ -19,7 +19,7 @@ if (isset($_POST['cancella_prenotazione'])) {
     // Verifica che la prenotazione appartenga all'utente e sia cancellabile
     $stmt = $conn->prepare("
         SELECT p.*, t.data_partenza 
-        FROM PRENOTAZIONE p
+        FROM PRENOTAZIONI p
         JOIN TRENO t ON p.id_treno = t.id_treno
         WHERE p.id_prenotazione = ? AND p.id_utente = ?
     ");
@@ -31,7 +31,7 @@ if (isset($_POST['cancella_prenotazione'])) {
         // Verifica che il viaggio non sia già passato
         if (strtotime($prenotazione['data_partenza']) > time()) {
             // Aggiorna lo stato a ANNULLATA
-            $stmt = $conn->prepare("UPDATE PRENOTAZIONE SET stato = 'ANNULLATA' WHERE id_prenotazione = ?");
+            $stmt = $conn->prepare("UPDATE PRENOTAZIONI SET stato = 'ANNULLATA' WHERE id_prenotazione = ?");
             $stmt->bind_param("i", $id_prenotazione);
             
             if ($stmt->execute()) {
@@ -71,16 +71,16 @@ $query = "
         b.stato_pagamento,
         fp.orario_partenza,
         fa.orario_arrivo
-    FROM PRENOTAZIONE p
-    JOIN TRENO t ON p.id_treno = t.id_treno
-    JOIN CONVOGLIO c ON t.id_convoglio = c.id_convoglio
-    JOIN STAZIONE sp ON p.id_stazione_partenza = sp.id_stazione
-    JOIN STAZIONE sa ON p.id_stazione_arrivo = sa.id_stazione
-    JOIN POSTO po ON p.id_posto = po.id_posto
+    FROM PRENOTAZIONI p
+    JOIN TRENI t ON p.id_treno = t.id_treno
+    JOIN CONVOGLI c ON t.id_convoglio = c.id_convoglio
+    JOIN STAZIONI sp ON p.id_stazione_partenza = sp.id_stazione
+    JOIN STAZIONI sa ON p.id_stazione_arrivo = sa.id_stazione
+    JOIN POSTI po ON p.id_posto = po.id_posto
     JOIN MATERIALE_ROTABILE m ON po.id_materiale = m.id_materiale
-    LEFT JOIN BIGLIETTO b ON p.id_prenotazione = b.id_prenotazione
-    LEFT JOIN FERMATA fp ON t.id_treno = fp.id_treno AND fp.id_stazione = sp.id_stazione
-    LEFT JOIN FERMATA fa ON t.id_treno = fa.id_treno AND fa.id_stazione = sa.id_stazione
+    LEFT JOIN BIGLIETTI b ON p.id_prenotazione = b.id_prenotazione
+    LEFT JOIN FERMATE fp ON t.id_treno = fp.id_treno AND fp.id_stazione = sp.id_stazione
+    LEFT JOIN FERMATE fa ON t.id_treno = fa.id_treno AND fa.id_stazione = sa.id_stazione
     WHERE p.id_utente = ?
 ";
 
@@ -109,7 +109,7 @@ $stmt_stats = $conn->prepare("
         SUM(CASE WHEN stato = 'CONFERMATA' THEN 1 ELSE 0 END) as confermate,
         SUM(CASE WHEN stato = 'IN_ATTESA_PAGAMENTO' THEN 1 ELSE 0 END) as in_attesa,
         SUM(CASE WHEN stato = 'ANNULLATA' THEN 1 ELSE 0 END) as annullate
-    FROM PRENOTAZIONE
+    FROM PRENOTAZIONI
     WHERE id_utente = ?
 ");
 $stmt_stats->bind_param("i", $user_id);

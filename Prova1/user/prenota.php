@@ -37,7 +37,7 @@ if ($step == 3 && $_SERVER['REQUEST_METHOD'] == 'POST' && $id_posto) {
         // Verifica che il posto sia ancora disponibile
         $stmt = $conn->prepare("
             SELECT COUNT(*) as occupato
-            FROM PRENOTAZIONE
+            FROM PRENOTAZIONI
             WHERE id_treno = ? 
             AND id_posto = ?
             AND stato IN ('IN_ATTESA_PAGAMENTO', 'CONFERMATA')
@@ -59,9 +59,9 @@ if ($step == 3 && $_SERVER['REQUEST_METHOD'] == 'POST' && $id_posto) {
                     sa.nome as nome_arrivo,
                     sp.km_progressivo as km_partenza,
                     sa.km_progressivo as km_arrivo
-                FROM TRENO t
-                JOIN STAZIONE sp ON sp.id_stazione = ?
-                JOIN STAZIONE sa ON sa.id_stazione = ?
+                FROM TRENI t
+                JOIN STAZIONI sp ON sp.id_stazione = ?
+                JOIN STAZIONI sa ON sa.id_stazione = ?
                 WHERE t.id_treno = ?
             ");
             $stmt->bind_param("iii", $stazione_partenza, $stazione_arrivo, $id_treno);
@@ -80,7 +80,7 @@ if ($step == 3 && $_SERVER['REQUEST_METHOD'] == 'POST' && $id_posto) {
                 $codice_prenotazione = 'SFT' . date('Ymd') . sprintf('%06d', rand(1, 999999));
                 
                 // Verifica unicità codice
-                $stmt = $conn->prepare("SELECT COUNT(*) as esiste FROM PRENOTAZIONE WHERE codice_prenotazione = ?");
+                $stmt = $conn->prepare("SELECT COUNT(*) as esiste FROM PRENOTAZIONI WHERE codice_prenotazione = ?");
                 $stmt->bind_param("s", $codice_prenotazione);
                 $stmt->execute();
                 $check_codice = $stmt->get_result()->fetch_assoc();
@@ -94,7 +94,7 @@ if ($step == 3 && $_SERVER['REQUEST_METHOD'] == 'POST' && $id_posto) {
                 
                 // Inserisci prenotazione con stato IN_ATTESA_PAGAMENTO
                 $stmt = $conn->prepare("
-                    INSERT INTO PRENOTAZIONE 
+                    INSERT INTO PRENOTAZIONI 
                     (id_utente, id_treno, id_stazione_partenza, id_stazione_arrivo, id_posto, codice_prenotazione, stato)
                     VALUES (?, ?, ?, ?, ?, ?, 'IN_ATTESA_PAGAMENTO')
                 ");
@@ -130,7 +130,7 @@ if ($step == 3 && $_SERVER['REQUEST_METHOD'] == 'POST' && $id_posto) {
                         
                         // Crea il biglietto con stato IN_ATTESA_PAGAMENTO
                         $stmt = $conn->prepare("
-                            INSERT INTO BIGLIETTO 
+                            INSERT INTO BIGLIETTI 
                             (id_prenotazione, importo, codice_pagamento, stato_pagamento)
                             VALUES (?, ?, ?, 'IN_ATTESA_PAGAMENTO')
                         ");
@@ -149,7 +149,7 @@ if ($step == 3 && $_SERVER['REQUEST_METHOD'] == 'POST' && $id_posto) {
                         $error = "Errore nel sistema di pagamento: " . ($risposta_paysteam['errore'] ?? 'Errore sconosciuto');
                         
                         // Annulla la prenotazione
-                        $stmt = $conn->prepare("UPDATE PRENOTAZIONE SET stato = 'ANNULLATA' WHERE id_prenotazione = ?");
+                        $stmt = $conn->prepare("UPDATE PRENOTAZIONI SET stato = 'ANNULLATA' WHERE id_prenotazione = ?");
                         $stmt->bind_param("i", $id_prenotazione);
                         $stmt->execute();
                     }
@@ -163,7 +163,7 @@ if ($step == 3 && $_SERVER['REQUEST_METHOD'] == 'POST' && $id_posto) {
 }
 
 // Recupera lista stazioni per lo step 1
-$stazioni = $conn->query("SELECT * FROM STAZIONE ORDER BY km_progressivo");
+$stazioni = $conn->query("SELECT * FROM STAZIONI ORDER BY km_progressivo");
 
 ?>
 <!DOCTYPE html>
@@ -748,12 +748,12 @@ $stazioni = $conn->query("SELECT * FROM STAZIONE ORDER BY km_progressivo");
                             sa.nome as stazione_arrivo_nome,
                             sp.km_progressivo as km_partenza,
                             sa.km_progressivo as km_arrivo
-                        FROM TRENO t
-                        JOIN CONVOGLIO c ON t.id_convoglio = c.id_convoglio
-                        JOIN FERMATA fp ON t.id_treno = fp.id_treno AND fp.id_stazione = ?
-                        JOIN FERMATA fa ON t.id_treno = fa.id_treno AND fa.id_stazione = ?
-                        JOIN STAZIONE sp ON fp.id_stazione = sp.id_stazione
-                        JOIN STAZIONE sa ON fa.id_stazione = sa.id_stazione
+                        FROM TRENI t
+                        JOIN CONVOGLI c ON t.id_convoglio = c.id_convoglio
+                        JOIN FERMATE fp ON t.id_treno = fp.id_treno AND fp.id_stazione = ?
+                        JOIN FERMATE fa ON t.id_treno = fa.id_treno AND fa.id_stazione = ?
+                        JOIN STAZIONI sp ON fp.id_stazione = sp.id_stazione
+                        JOIN STAZIONI sa ON fa.id_stazione = sa.id_stazione
                         WHERE DATE(t.data_partenza) = ?
                         AND fp.ordine_fermata < fa.ordine_fermata
                         ORDER BY fp.orario_partenza
@@ -784,12 +784,12 @@ $stazioni = $conn->query("SELECT * FROM STAZIONE ORDER BY km_progressivo");
                                     sa.nome as stazione_arrivo_nome,
                                     sp.km_progressivo as km_partenza,
                                     sa.km_progressivo as km_arrivo
-                                FROM TRENO t
-                                JOIN CONVOGLIO c ON t.id_convoglio = c.id_convoglio
-                                JOIN FERMATA fp ON t.id_treno = fp.id_treno AND fp.id_stazione = ?
-                                JOIN FERMATA fa ON t.id_treno = fa.id_treno AND fa.id_stazione = ?
-                                JOIN STAZIONE sp ON fp.id_stazione = sp.id_stazione
-                                JOIN STAZIONE sa ON fa.id_stazione = sa.id_stazione
+                                FROM TRENI t
+                                JOIN CONVOGLI c ON t.id_convoglio = c.id_convoglio
+                                JOIN FERMATE fp ON t.id_treno = fp.id_treno AND fp.id_stazione = ?
+                                JOIN FERMATE fa ON t.id_treno = fa.id_treno AND fa.id_stazione = ?
+                                JOIN STAZIONI sp ON fp.id_stazione = sp.id_stazione
+                                JOIN STAZIONI sa ON fa.id_stazione = sa.id_stazione
                                 WHERE t.id_treno = ?
                             ");
                             $stmt->bind_param("iii", $stazione_partenza, $stazione_arrivo, $id_treno);
@@ -810,17 +810,17 @@ $stazioni = $conn->query("SELECT * FROM STAZIONE ORDER BY km_progressivo");
                                     m.nome as materiale_nome,
                                     CASE 
                                         WHEN EXISTS (
-                                            SELECT 1 FROM PRENOTAZIONE pr 
+                                            SELECT 1 FROM PRENOTAZIONI pr 
                                             WHERE pr.id_posto = p.id_posto 
                                             AND pr.id_treno = ?
                                             AND pr.stato IN ('IN_ATTESA_PAGAMENTO', 'CONFERMATA')
                                         ) THEN 1
                                         ELSE 0
                                     END as occupato
-                                FROM POSTO p
+                                FROM POSTI p
                                 JOIN MATERIALE_ROTABILE m ON p.id_materiale = m.id_materiale
-                                JOIN COMPOSIZIONE_CONVOGLIO cc ON m.id_materiale = cc.id_materiale
-                                JOIN TRENO t ON cc.id_convoglio = t.id_convoglio
+                                JOIN COMPOSIZIONI cc ON m.id_materiale = cc.id_materiale
+                                JOIN TRENI t ON cc.id_convoglio = t.id_convoglio
                                 WHERE t.id_treno = ?
                                 ORDER BY cc.posizione, p.numero_posto
                             ");

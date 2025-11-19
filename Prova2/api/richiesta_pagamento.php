@@ -94,8 +94,8 @@ try {
     // Verifica che l'esercente esista e sia effettivamente un ESERCENTE
     $stmt = $conn->prepare("
         SELECT u.id_utente, u.nome, u.cognome, p.nome as profilo
-        FROM utente u
-        JOIN profilo p ON u.id_profilo = p.id_profilo
+        FROM utenti u
+        JOIN profili p ON u.id_profilo = p.id_profilo
         WHERE u.id_utente = ? AND u.attivo = 1
     ");
     $stmt->bind_param("i", $id_esercente);
@@ -126,7 +126,7 @@ try {
     $codice_transazione = generateTransactionCode();
     
     // Verifica che il codice sia univoco
-    $stmt = $conn->prepare("SELECT id_transazione FROM transazione WHERE codice_transazione = ?");
+    $stmt = $conn->prepare("SELECT id_transazione FROM transazioni WHERE codice_transazione = ?");
     $stmt->bind_param("s", $codice_transazione);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -143,7 +143,7 @@ try {
     
     // Inserisci la transazione con stato IN_ATTESA
     $stmt = $conn->prepare("
-        INSERT INTO transazione 
+        INSERT INTO transazioni 
         (codice_transazione, id_esercente, importo, descrizione, url_chiamante, url_risposta, id_transazione_esterna, stato)
         VALUES (?, ?, ?, ?, ?, ?, ?, 'IN_ATTESA')
     ");

@@ -15,7 +15,7 @@ $conn = getDBConnection();
 // Recupera statistiche utente
 $stmt = $conn->prepare("
     SELECT COUNT(*) as tot_prenotazioni 
-    FROM PRENOTAZIONE 
+    FROM PRENOTAZIONI 
     WHERE id_utente = ?
 ");
 $stmt->bind_param("i", $user_id);
@@ -36,13 +36,13 @@ $stmt = $conn->prepare("
         po.numero_posto,
         m.sigla as materiale,
         b.importo
-    FROM PRENOTAZIONE p
-    JOIN TRENO t ON p.id_treno = t.id_treno
-    JOIN STAZIONE sp ON p.id_stazione_partenza = sp.id_stazione
-    JOIN STAZIONE sa ON p.id_stazione_arrivo = sa.id_stazione
-    JOIN POSTO po ON p.id_posto = po.id_posto
+    FROM PRENOTAZIONI p
+    JOIN TRENI t ON p.id_treno = t.id_treno
+    JOIN STAZIONI sp ON p.id_stazione_partenza = sp.id_stazione
+    JOIN STAZIONI sa ON p.id_stazione_arrivo = sa.id_stazione
+    JOIN POSTI po ON p.id_posto = po.id_posto
     JOIN MATERIALE_ROTABILE m ON po.id_materiale = m.id_materiale
-    LEFT JOIN BIGLIETTO b ON p.id_prenotazione = b.id_prenotazione
+    LEFT JOIN BIGLIETTI b ON p.id_prenotazione = b.id_prenotazione
     WHERE p.id_utente = ?
     ORDER BY p.data_prenotazione DESC
     LIMIT 10

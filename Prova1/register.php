@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $conn = getDBConnection();
         
         // Verifica se email già esistente
-        $stmt = $conn->prepare("SELECT id_utente FROM UTENTE WHERE email = ?");
+        $stmt = $conn->prepare("SELECT id_utente FROM UTENTI WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $error = 'Email già registrata';
         } else {
             // Ottieni ID profilo "REGISTRATO"
-            $stmt = $conn->prepare("SELECT id_profilo FROM PROFILO WHERE nome = 'REGISTRATO'");
+            $stmt = $conn->prepare("SELECT id_profilo FROM PROFILI WHERE nome = 'REGISTRATO'");
             $stmt->execute();
             $result = $stmt->get_result();
             $profilo = $result->fetch_assoc();
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Inserisci nuovo utente
             $password_hash = md5($password);
             $stmt = $conn->prepare("
-                INSERT INTO UTENTE (email, password, nome, cognome, telefono, id_profilo, attivo)
+                INSERT INTO UTENTI (email, password, nome, cognome, telefono, id_profilo, attivo)
                 VALUES (?, ?, ?, ?, ?, ?, 1)
             ");
             $stmt->bind_param("sssssi", $email, $password_hash, $nome, $cognome, $telefono, $id_profilo);
