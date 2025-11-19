@@ -20,7 +20,7 @@ if (isset($_POST['cancella_prenotazione'])) {
     $stmt = $conn->prepare("
         SELECT p.*, t.data_partenza 
         FROM PRENOTAZIONI p
-        JOIN TRENO t ON p.id_treno = t.id_treno
+        JOIN TRENI t ON p.id_treno = t.id_treno
         WHERE p.id_prenotazione = ? AND p.id_utente = ?
     ");
     $stmt->bind_param("ii", $id_prenotazione, $user_id);

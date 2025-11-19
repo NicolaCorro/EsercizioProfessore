@@ -105,7 +105,7 @@ function executeTransaction($conn, $id_transazione, $id_cliente, $id_esercente, 
     
     try {
         // 1. Recupera conti
-        $stmt = $conn->prepare("SELECT id_conto, saldo FROM CONTO WHERE id_utente = ?");
+        $stmt = $conn->prepare("SELECT id_conto, saldo FROM CONTI WHERE id_utente = ?");
         
         // Conto cliente
         $stmt->bind_param("i", $id_cliente);
@@ -129,7 +129,7 @@ function executeTransaction($conn, $id_transazione, $id_cliente, $id_esercente, 
         $nuovo_saldo_cliente = $conto_cliente['saldo'] - $importo;
         $nuovo_saldo_esercente = $conto_esercente['saldo'] + $importo;
         
-        $stmt = $conn->prepare("UPDATE CONTO SET saldo = ? WHERE id_conto = ?");
+        $stmt = $conn->prepare("UPDATE CONTI SET saldo = ? WHERE id_conto = ?");
         
         $stmt->bind_param("di", $nuovo_saldo_cliente, $conto_cliente['id_conto']);
         $stmt->execute();
@@ -142,7 +142,7 @@ function executeTransaction($conn, $id_transazione, $id_cliente, $id_esercente, 
         $causale_entrata = "Incasso transazione " . $id_transazione;
         
         $stmt = $conn->prepare("
-            INSERT INTO MOVIMENTO (id_conto, id_transazione, tipo, importo, causale, saldo_precedente, saldo_nuovo)
+            INSERT INTO MOVIMENTI (id_conto, id_transazione, tipo, importo, causale, saldo_precedente, saldo_nuovo)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
         
@@ -174,7 +174,7 @@ function executeTransaction($conn, $id_transazione, $id_cliente, $id_esercente, 
         
         // 4. Aggiorna stato transazione
         $stmt = $conn->prepare("
-            UPDATE TRANSAZIONE 
+            UPDATE TRANSAZIONI 
             SET stato = 'COMPLETATA', data_completamento = NOW() 
             WHERE id_transazione = ?
         ");

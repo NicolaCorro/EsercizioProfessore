@@ -99,6 +99,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $transazione) {
                     // Invia risposta (in background, non blocchiamo l'utente)
                     sendAPIResponse($transazione['url_risposta'], $response_data);
                     
+                    // Redirect all'applicazione chiamante
+                    $url_ritorno = $transazione['url_chiamante'] . '/user/pagamento_completato.php?codice=' . urlencode($codice_transazione);
+                    header("Location: " . $url_ritorno);
+                    exit();
+
                     // Aggiorna i dati della transazione per la visualizzazione
                     $transazione['stato'] = 'COMPLETATA';
                     $saldo_disponibile -= $transazione['importo'];

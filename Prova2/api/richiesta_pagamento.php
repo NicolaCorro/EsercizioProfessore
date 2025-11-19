@@ -140,21 +140,24 @@ try {
         $result = $stmt->get_result();
         $tentativi++;
     }
+
+    $data_corrente = date('Y-m-d H:i:s');
     
     // Inserisci la transazione con stato IN_ATTESA
     $stmt = $conn->prepare("
         INSERT INTO transazioni 
-        (codice_transazione, id_esercente, importo, descrizione, url_chiamante, url_risposta, id_transazione_esterna, stato)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 'IN_ATTESA')
+        (codice_transazione, id_esercente, importo, descrizione, url_chiamante, url_risposta, id_transazione_esterna, stato, data_richiesta)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'IN_ATTESA', ?)
     ");
-    $stmt->bind_param("sidssss", 
+    $stmt->bind_param("sidsssss",
         $codice_transazione, 
         $id_esercente, 
         $importo, 
         $descrizione, 
         $url_chiamante, 
         $url_risposta, 
-        $id_transazione_esterna
+        $id_transazione_esterna,
+        $data_corrente
     );
     
     if (!$stmt->execute()) {
