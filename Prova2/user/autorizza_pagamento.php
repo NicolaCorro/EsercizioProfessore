@@ -89,11 +89,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $transazione) {
                     
                     // Invia risposta all'applicazione chiamante
                     $response_data = [
-                        'codice_transazione' => $codice_transazione,
-                        'id_transazione_esterna' => $transazione['id_transazione_esterna'],
-                        'esito' => 'OK',
-                        'importo' => $transazione['importo'],
-                        'data_completamento' => date('Y-m-d H:i:s')
+                    'url_chiamante' => PAY_STEAM_URL,  // ✅ Aggiungi questo
+                    'id_transazione' => $transazione['id_transazione_esterna'],  // ✅ USA il codice SFT!
+                    'esito' => 'OK'
                     ];
                     
                     // Invia risposta (in background, non blocchiamo l'utente)
@@ -139,10 +137,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $transazione) {
         if ($stmt->execute()) {
             // Invia risposta all'applicazione chiamante
             $response_data = [
-                'codice_transazione' => $codice_transazione,
-                'id_transazione_esterna' => $transazione['id_transazione_esterna'],
-                'esito' => 'KO',
-                'motivo' => 'Pagamento rifiutato dall\'utente'
+            'url_chiamante' => SITE_URL,
+            'id_transazione' => $transazione['id_transazione_esterna'],  // ✅ Usa il codice SFT!
+            'esito' => 'KO'
             ];
             
             sendAPIResponse($transazione['url_risposta'], $response_data);

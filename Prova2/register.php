@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $telefono = trim($_POST['telefono'] ?? '');
     $password = $_POST['password'] ?? '';
     $password_confirm = $_POST['password_confirm'] ?? '';
-    $tipo_profilo = $_POST['tipo_profilo'] ?? 'UTENTE';
+    $tipo_profilo = 'UTENTE';
     
     // Dati carta di credito (opzionali)
     $numero_carta = trim($_POST['numero_carta'] ?? '');
@@ -35,8 +35,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $error = 'La password deve essere di almeno 6 caratteri';
     } elseif ($password !== $password_confirm) {
         $error = 'Le password non coincidono';
-    } elseif (!in_array($tipo_profilo, ['UTENTE', 'ESERCENTE'])) {
-        $error = 'Tipo di profilo non valido';
     } else {
         // Validazione carta di credito (se fornita)
         $has_carta = !empty($numero_carta);
@@ -404,27 +402,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
         
         <form method="POST" action="">
-            <div class="form-section">
-                <h3>Tipo di Account</h3>
-                <div class="profile-selector">
-                    <div class="profile-option">
-                        <input type="radio" id="utente" name="tipo_profilo" value="UTENTE" checked>
-                        <label for="utente">
-                            <div class="profile-icon">👤</div>
-                            <div class="profile-name">Utente</div>
-                            <div class="profile-desc">Per effettuare acquisti</div>
-                        </label>
-                    </div>
-                    <div class="profile-option">
-                        <input type="radio" id="esercente" name="tipo_profilo" value="ESERCENTE">
-                        <label for="esercente">
-                            <div class="profile-icon">🏪</div>
-                            <div class="profile-name">Esercente</div>
-                            <div class="profile-desc">Per ricevere pagamenti</div>
-                        </label>
-                    </div>
-                </div>
-            </div>
+            <input type="hidden" name="tipo_profilo" value="UTENTE">    
             
             <div class="form-section">
                 <h3>Dati Personali</h3>
