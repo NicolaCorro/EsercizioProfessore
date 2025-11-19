@@ -23,7 +23,7 @@ define('DB_NAME', 'pay_steam');
 // CONFIGURAZIONE APPLICAZIONE
 // =====================================================
 define('SITE_NAME', 'Pay Steam');
-define('SITE_URL', 'http://localhost/ProveItinere1/Prova2');
+define('SITE_URL', 'http://localhost/ProveItinere1/EsercizioProfessore/Prova2');
 define('API_URL', SITE_URL . '/api');
 
 // =====================================================

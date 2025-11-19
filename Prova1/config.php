@@ -13,7 +13,7 @@ function getDBConnection() {
     
     if ($conn->connect_error) {
         die("Errore connessione: " . $conn->connect_error);
-        
+
     }
     
     $conn->set_charset("utf8mb4");
@@ -30,13 +30,13 @@ function closeDBConnection($conn) {
 // =====================================================
 // CONFIGURAZIONE PAY STEAM (Sistema di Pagamento)
 // =====================================================
-define('PAY_STEAM_URL', 'http://localhost/ProveItinere1/Prova2');
+define('PAY_STEAM_URL', 'http://localhost/ProveItinere1/EsercizioProfessore/Prova2');
 define('PAY_STEAM_API_URL', PAY_STEAM_URL . '/api/richiesta_pagamento.php');
 define('PAY_STEAM_ESERCENTE_ID', 3); // ID esercente SFT su Pay Steam
 
 // URL di callback per ricevere conferma pagamento
-define('SFT_CALLBACK_URL', 'http://localhost/ProveItinere1/Prova1/api/conferma_pagamento.php');
-define('SFT_BASE_URL', 'http://localhost/ProveItinere1/Prova1');
+define('SFT_CALLBACK_URL', 'http://localhost/ProveItinere1/EsercizioProfessore/Prova1/api/conferma_pagamento.php');
+define('SFT_BASE_URL', 'http://localhost/ProveItinere1/EsercizioProfessore/Prova1');
 
 // =====================================================
 // FUNZIONE: Richiedi Pagamento a Pay Steam

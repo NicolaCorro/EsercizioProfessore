@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Query per verificare le credenziali
         $stmt = $conn->prepare("
             SELECT u.id_utente, u.email, u.password, u.nome, u.cognome, p.nome as profilo
-            FROM utente u
+            FROM utenti u
             JOIN profilo p ON u.id_profilo = p.id_profilo
             WHERE u.email = ? AND u.attivo = 1
         ");
