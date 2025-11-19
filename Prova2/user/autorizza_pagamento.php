@@ -89,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $transazione) {
                     
                     // Invia risposta all'applicazione chiamante
                     $response_data = [
-                    'url_chiamante' => PAY_STEAM_URL,  // ✅ Aggiungi questo
+                    'url_chiamante' => SITE_URL,  // ✅ Aggiungi questo
                     'id_transazione' => $transazione['id_transazione_esterna'],  // ✅ USA il codice SFT!
                     'esito' => 'OK'
                     ];
@@ -128,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $transazione) {
     } elseif ($azione == 'rifiuta') {
         // Rifiuta la transazione
         $stmt = $conn->prepare("
-            UPDATE transazioni 
+            UPDATE transazione 
             SET stato = 'RIFIUTATA', note = 'Rifiutato dall\'utente' 
             WHERE id_transazione = ? AND stato = 'IN_ATTESA'
         ");

@@ -58,6 +58,7 @@ function richiestaPagamentoPaySteam($importo, $descrizione, $id_transazione_este
         'importo' => $importo,
         'id_transazione_esterna' => $id_transazione_esterna
     ];
+    error_log("SFT invia a Pay Steam: " . json_encode($data));
     
     // Inizializza cURL
     $ch = curl_init(PAY_STEAM_API_URL);

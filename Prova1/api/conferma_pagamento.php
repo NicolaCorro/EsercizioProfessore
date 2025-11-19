@@ -84,7 +84,7 @@ if (strpos($url_chiamante, 'pay') === false && strpos($url_chiamante, 'steam') =
 
 // Connessione database
 $conn = getDBConnection();
-
+error_log("DEBUG: Cerco prenotazione con codice: " . $id_transazione);
 try {
     // Cerca la prenotazione associata a questa transazione Pay Steam
     // Il codice transazione Pay Steam è salvato nel campo codice_pagamento del BIGLIETTO
@@ -99,15 +99,16 @@ try {
             b.id_biglietto,
             b.importo,
             b.stato_pagamento
-        FROM PRENOTAZIONE p
-        LEFT JOIN BIGLIETTO b ON p.id_prenotazione = b.id_prenotazione
+        FROM prenotazioni p
+        LEFT JOIN biglietti b ON p.id_prenotazione = b.id_prenotazione
         WHERE b.codice_pagamento = ? OR p.codice_prenotazione = ?
         LIMIT 1
     ");
-    
     $stmt->bind_param("ss", $id_transazione, $id_transazione);
     $stmt->execute();
     $result = $stmt->get_result();
+    
+    error_log("DEBUG: ID transazione cercato: " . $id_transazione);
     
     if ($result->num_rows === 0) {
         // Prova a cercare solo per codice_prenotazione come fallback
@@ -120,13 +121,14 @@ try {
                 p.id_posto,
                 p.stato,
                 p.codice_prenotazione
-            FROM PRENOTAZIONE p
+            FROM prenotazioni p
             WHERE p.codice_prenotazione = ?
             LIMIT 1
         ");
         $stmt->bind_param("s", $id_transazione);
         $stmt->execute();
         $result = $stmt->get_result();
+        error_log("DEBUG: Seconda query (fallback) - righe trovate: " . $result->num_rows);  // ⬅️ Testo più chiaro
         
         if ($result->num_rows === 0) {
             http_response_code(404);
@@ -142,7 +144,9 @@ try {
     
     // Inizia transazione SQL per atomicità
     $conn->begin_transaction();
-    
+
+    $prenotazione = $result->fetch_assoc();
+    error_log("DEBUG: Prenotazione trovata - ID: " . $prenotazione['id_prenotazione'] . ", Stato: " . $prenotazione['stato']);
     if ($esito === 'OK') {
         // PAGAMENTO COMPLETATO CON SUCCESSO
         
@@ -159,7 +163,7 @@ try {
         
         // Aggiorna stato prenotazione a CONFERMATA
         $stmt = $conn->prepare("
-            UPDATE PRENOTAZIONE 
+            UPDATE prenotazioni 
             SET stato = 'CONFERMATA' 
             WHERE id_prenotazione = ?
         ");
@@ -173,7 +177,7 @@ try {
         if (isset($prenotazione['id_biglietto']) && $prenotazione['id_biglietto']) {
             // Aggiorna biglietto esistente
             $stmt = $conn->prepare("
-                UPDATE BIGLIETTO 
+                UPDATE biglietti 
                 SET stato_pagamento = 'PAGATO',
                     codice_pagamento = ?
                 WHERE id_biglietto = ?
@@ -186,7 +190,7 @@ try {
         } else {
             // Crea nuovo biglietto
             $stmt = $conn->prepare("
-                INSERT INTO BIGLIETTO 
+                INSERT INTO biglietti 
                 (id_prenotazione, importo, codice_pagamento, stato_pagamento)
                 VALUES (?, ?, ?, 'PAGATO')
             ");
@@ -216,7 +220,7 @@ try {
         
         // Annulla la prenotazione
         $stmt = $conn->prepare("
-            UPDATE PRENOTAZIONE 
+            UPDATE prenotazioni 
             SET stato = 'ANNULLATA' 
             WHERE id_prenotazione = ?
         ");
@@ -229,7 +233,7 @@ try {
         // Se esiste un biglietto, aggiornalo
         if (isset($prenotazione['id_biglietto']) && $prenotazione['id_biglietto']) {
             $stmt = $conn->prepare("
-                UPDATE BIGLIETTO 
+                UPDATE biglietti 
                 SET stato_pagamento = 'NON_PAGATO',
                     codice_pagamento = ?
                 WHERE id_biglietto = ?
@@ -257,7 +261,7 @@ try {
     if ($conn) {
         $conn->rollback();
     }
-    
+    error_log("ERRORE in conferma_pagamento.php: " . $e->getMessage());
     http_response_code(500);
     echo json_encode([
         'success' => false,
