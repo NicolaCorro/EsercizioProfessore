@@ -17,6 +17,7 @@ $userProfile = $isLoggedIn ? $_SESSION['user_profile'] : '';
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            
         }
         
         body {
