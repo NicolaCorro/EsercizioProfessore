@@ -103,19 +103,19 @@ $stats_query = "
         COUNT(DISTINCT p.id_prenotazione) as tot_prenotazioni,
         SUM(CASE WHEN p.stato = 'CONFERMATA' THEN b.importo ELSE 0 END) as ricavi_totali,
         AVG(occupazione.percentuale) as occupazione_media
-    FROM TRENO t
-    LEFT JOIN PRENOTAZIONE p ON t.id_treno = p.id_treno
-    LEFT JOIN BIGLIETTO b ON p.id_prenotazione = b.id_prenotazione
+    FROM TRENI t
+    LEFT JOIN PRENOTAZIONI p ON t.id_treno = p.id_treno
+    LEFT JOIN BIGLIETTI b ON p.id_prenotazione = b.id_prenotazione
     LEFT JOIN (
         SELECT 
             t.id_treno,
             (COUNT(DISTINCT CASE WHEN p.stato = 'CONFERMATA' THEN p.id_posto END) * 100.0 / 
             COUNT(DISTINCT po.id_posto)) as percentuale
-        FROM TRENO t
-        JOIN CONVOGLIO c ON t.id_convoglio = c.id_convoglio
-        JOIN COMPOSIZIONE_CONVOGLIO cc ON c.id_convoglio = cc.id_convoglio
-        JOIN POSTO po ON cc.id_materiale = po.id_materiale
-        LEFT JOIN PRENOTAZIONE p ON t.id_treno = p.id_treno AND po.id_posto = p.id_posto
+        FROM TRENI t
+        JOIN CONVOGLI c ON t.id_convoglio = c.id_convoglio
+        JOIN COMPOSIZIONI cc ON c.id_convoglio = cc.id_convoglio
+        JOIN POSTI po ON cc.id_materiale = po.id_materiale
+        LEFT JOIN PRENOTAZIONI p ON t.id_treno = p.id_treno AND po.id_posto = p.id_posto
         GROUP BY t.id_treno
     ) as occupazione ON t.id_treno = occupazione.id_treno
 ";
@@ -138,18 +138,18 @@ $redditività_query = "
         ABS(sa.km_progressivo - sp.km_progressivo) as km_totali,
         ROUND(COALESCE(SUM(CASE WHEN p.stato = 'CONFERMATA' THEN b.importo END), 0) / 
               ABS(sa.km_progressivo - sp.km_progressivo), 2) as ricavo_per_km
-    FROM TRENO t
-    JOIN CONVOGLIO c ON t.id_convoglio = c.id_convoglio
-    JOIN COMPOSIZIONE_CONVOGLIO cc ON c.id_convoglio = cc.id_convoglio
-    JOIN POSTO po ON cc.id_materiale = po.id_materiale
-    LEFT JOIN PRENOTAZIONE p ON t.id_treno = p.id_treno AND po.id_posto = p.id_posto
-    LEFT JOIN BIGLIETTO b ON p.id_prenotazione = b.id_prenotazione
-    JOIN FERMATA fp ON t.id_treno = fp.id_treno
-    JOIN FERMATA fa ON t.id_treno = fa.id_treno
-    JOIN STAZIONE sp ON fp.id_stazione = sp.id_stazione
-    JOIN STAZIONE sa ON fa.id_stazione = sa.id_stazione
+    FROM TRENI t
+    JOIN CONVOGLI c ON t.id_convoglio = c.id_convoglio
+    JOIN COMPOSIZIONI cc ON c.id_convoglio = cc.id_convoglio
+    JOIN POSTI po ON cc.id_materiale = po.id_materiale
+    LEFT JOIN PRENOTAZIONI p ON t.id_treno = p.id_treno AND po.id_posto = p.id_posto
+    LEFT JOIN BIGLIETTI b ON p.id_prenotazione = b.id_prenotazione
+    JOIN FERMATE fp ON t.id_treno = fp.id_treno
+    JOIN FERMATE fa ON t.id_treno = fa.id_treno
+    JOIN STAZIONI sp ON fp.id_stazione = sp.id_stazione
+    JOIN STAZIONI sa ON fa.id_stazione = sa.id_stazione
     WHERE fp.ordine_fermata = 1 AND fa.ordine_fermata = (
-        SELECT MAX(ordine_fermata) FROM FERMATA WHERE id_treno = t.id_treno
+        SELECT MAX(ordine_fermata) FROM FERMATE WHERE id_treno = t.id_treno
     )
     GROUP BY t.id_treno, t.numero_treno, t.data_partenza, c.nome, 
              sp.nome, sa.nome, sp.km_progressivo, sa.km_progressivo
@@ -164,9 +164,9 @@ $treni_zero_query = "
         t.numero_treno,
         t.data_partenza,
         c.nome as convoglio_nome
-    FROM TRENO t
-    JOIN CONVOGLIO c ON t.id_convoglio = c.id_convoglio
-    LEFT JOIN PRENOTAZIONE p ON t.id_treno = p.id_treno AND p.stato != 'ANNULLATA'
+    FROM TRENI t
+    JOIN CONVOGLI c ON t.id_convoglio = c.id_convoglio
+    LEFT JOIN PRENOTAZIONI p ON t.id_treno = p.id_treno AND p.stato != 'ANNULLATA'
     WHERE t.data_partenza >= CURDATE()
     GROUP BY t.id_treno
     HAVING COUNT(p.id_prenotazione) = 0
@@ -181,15 +181,15 @@ $richieste_query = "
         u.nome as admin_nome,
         t.numero_treno
     FROM RICHIESTA_ADMIN r
-    JOIN UTENTE u ON r.id_utente = u.id_utente
-    LEFT JOIN TRENO t ON r.id_treno = t.id_treno
+    JOIN UTENTI u ON r.id_utente = u.id_utente
+    LEFT JOIN TRENI t ON r.id_treno = t.id_treno
     ORDER BY r.data_richiesta DESC
     LIMIT 10
 ";
 $richieste = $conn->query($richieste_query);
 
 // LISTA STAZIONI (per form treno straordinario)
-$stazioni = $conn->query("SELECT * FROM STAZIONE ORDER BY km_progressivo");
+$stazioni = $conn->query("SELECT * FROM STAZIONI ORDER BY km_progressivo");
 
 ?>
 <!DOCTYPE html>
