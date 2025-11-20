@@ -73,14 +73,14 @@ if ($esito !== 'OK' && $esito !== 'KO') {
 }
 
 // Verifica che la chiamata provenga da Pay Steam
-if (strpos($url_chiamante, 'pay') === false && strpos($url_chiamante, 'steam') === false) {
-    http_response_code(403);
-    echo json_encode([
-        'success' => false,
-        'errore' => 'Chiamata non autorizzata'
-    ]);
-    exit();
-}
+// if (strpos($url_chiamante, 'pay') === false && strpos($url_chiamante, 'steam') === false) {
+//     http_response_code(403);
+//     echo json_encode([
+//         'success' => false,
+//         'errore' => 'Chiamata non autorizzata'
+//     ]);
+//     exit();
+// }
 
 // Connessione database
 $conn = getDBConnection();
@@ -145,7 +145,7 @@ try {
     // Inizia transazione SQL per atomicità
     $conn->begin_transaction();
 
-    $prenotazione = $result->fetch_assoc();
+    //$prenotazione = $result->fetch_assoc();
     error_log("DEBUG: Prenotazione trovata - ID: " . $prenotazione['id_prenotazione'] . ", Stato: " . $prenotazione['stato']);
     if ($esito === 'OK') {
         // PAGAMENTO COMPLETATO CON SUCCESSO

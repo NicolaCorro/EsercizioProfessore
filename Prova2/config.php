@@ -17,7 +17,7 @@ if (session_status() === PHP_SESSION_NONE) {
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
 define('DB_PASS', '');
-define('DB_NAME', 'pay_steam');
+define('DB_NAME', 'ni_corro');
 
 // =====================================================
 // CONFIGURAZIONE APPLICAZIONE

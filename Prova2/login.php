@@ -276,7 +276,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div class="test-credentials">
             <h4>🔑 Credenziali di test:</h4>
             <p><strong>Utente (Mario Rossi):</strong><br>
-            Email: <code>mario.rossi@email.it</code><br>
+            Email: <code>mario.paysteam@email.it</code><br>
             Password: <code>mario123</code></p>
             
             <p style="margin-top: 0.75rem;"><strong>Utente (Anna Verdi):</strong><br>
@@ -286,10 +286,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <p style="margin-top: 0.75rem;"><strong>Esercente (SFT Ferrovie):</strong><br>
             Email: <code>sft@ferrovie.it</code><br>
             Password: <code>sft123</code></p>
-            
-            <p style="margin-top: 0.75rem;"><strong>Esercente (Hotel Roma):</strong><br>
-            Email: <code>hotel.roma@email.it</code><br>
-            Password: <code>hotel123</code></p>
         </div>
     </div>
 </body>

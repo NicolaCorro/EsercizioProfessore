@@ -5,7 +5,7 @@
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
 define('DB_PASS', '');
-define('DB_NAME', 'sft_prova1');
+define('DB_NAME', 'ni_corro');
 
 // Connessione al database
 function getDBConnection() {
@@ -32,7 +32,7 @@ function closeDBConnection($conn) {
 // =====================================================
 define('PAY_STEAM_URL', 'http://localhost/ProveItinere1/EsercizioProfessore/Prova2');
 define('PAY_STEAM_API_URL', PAY_STEAM_URL . '/api/richiesta_pagamento.php');
-define('PAY_STEAM_ESERCENTE_ID', 3); // ID esercente SFT su Pay Steam
+define('PAY_STEAM_ESERCENTE_ID', 7); // ID esercente SFT su Pay Steam
 
 // URL di callback per ricevere conferma pagamento
 define('SFT_CALLBACK_URL', 'http://localhost/ProveItinere1/EsercizioProfessore/Prova1/api/conferma_pagamento.php');

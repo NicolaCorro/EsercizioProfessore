@@ -26,8 +26,8 @@ if (isset($_POST['richiedi_cancellazione'])) {
         // Verifica che il treno esista e abbia 0 prenotazioni
         $stmt = $conn->prepare("
             SELECT t.numero_treno, COUNT(p.id_prenotazione) as tot_prenotazioni
-            FROM TRENO t
-            LEFT JOIN PRENOTAZIONE p ON t.id_treno = p.id_treno AND p.stato != 'ANNULLATA'
+            FROM TRENI t
+            LEFT JOIN PRENOTAZIONI p ON t.id_treno = p.id_treno AND p.stato != 'ANNULLATA'
             WHERE t.id_treno = ?
             GROUP BY t.id_treno
         ");

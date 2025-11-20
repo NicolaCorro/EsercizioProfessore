@@ -102,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $transazione) {
                     $saldo_disponibile -= $transazione['importo'];
 
                     // Redirect all'applicazione chiamante
-                    $url_ritorno = $transazione['url_chiamante'] . '/user/pagamento_completato.php?codice=' . urlencode($codice_transazione);
+                    $url_ritorno = $transazione['url_chiamante'] . '/user/pagamento_completato.php?codice=' . urlencode($transazione['id_transazione_esterna']) . '&esito=successo';
                     header("Location: " . $url_ritorno);
                     exit();
 
@@ -128,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $transazione) {
     } elseif ($azione == 'rifiuta') {
         // Rifiuta la transazione
         $stmt = $conn->prepare("
-            UPDATE transazione 
+            UPDATE transazioni 
             SET stato = 'RIFIUTATA', note = 'Rifiutato dall\'utente' 
             WHERE id_transazione = ? AND stato = 'IN_ATTESA'
         ");

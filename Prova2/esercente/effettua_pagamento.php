@@ -9,7 +9,7 @@ $conn = getDBConnection();
 // Recupera informazioni conto
 $stmt = $conn->prepare("
     SELECT id_conto, saldo
-    FROM conto
+    FROM conti
     WHERE id_utente = ?
 ");
 $stmt->bind_param("i", $_SESSION['user_id']);
